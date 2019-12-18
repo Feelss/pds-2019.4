@@ -23,7 +23,7 @@ def rms(arr, window_size):
     
     return ans
 
-def PSD(arr, window_size_fft, window_size_psd):
+def MPSD(arr, window_size_fft, window_size_psd):
     ffts = []
     n = len(arr)
     
@@ -34,11 +34,20 @@ def PSD(arr, window_size_fft, window_size_psd):
 
     n_fft = len(ffts)
     for i in range(0, n_fft - window_size_psd + 1):
-        cur = ffts[i]
+        cur = np.abs(ffts[i])
         for fft in range(i + 1, i + window_size_psd):
             for x in range(len(fft)):
-                cur[x] += fft[x]
+                cur[x] += np.abs(fft[x])
+        for i in range(len(cur)):
+            cur[i] /= window_size_psd
+        psds.append(cur)
+    
+    mpsd = []
 
+    for psd in psds:
+        mpsd.append(np.median(psd))
+
+    return mpsd
 def main():
     file = wave.open('01.wav', 'rb')
     n = file.getnframes()
